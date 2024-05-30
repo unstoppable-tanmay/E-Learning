@@ -30,7 +30,7 @@ const userSchema = z.object({
   tags: z.string(),
 });
 
-const Signup = () => {
+const Signup = ({ fancy = false }: { fancy?: boolean }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const [user, setUser] = useState<userType>({
@@ -66,8 +66,12 @@ const Signup = () => {
 
   return (
     <>
-      <Button onPress={onOpen} className="text-black bg-gray-300">
-        Sign Up
+      <Button
+        onPress={onOpen}
+        className={fancy ? "" : "text-black bg-gray-300"}
+        color={fancy ? "primary" : "default"}
+      >
+        {fancy ? "Let's Start" : "Sign Up"}
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -110,7 +114,9 @@ const Signup = () => {
                         placeholder="Select Some Tags"
                         selectionMode="multiple"
                         className="w-full"
-                        onSelectionChange={(e) => change(Array.from(e).join(','), "tags")}
+                        onSelectionChange={(e) =>
+                          change(Array.from(e).join(","), "tags")
+                        }
                       >
                         {tags.map((tag) => (
                           <SelectItem key={tag}>{tag}</SelectItem>
@@ -145,7 +151,9 @@ const Signup = () => {
                         placeholder="Select Some Tags"
                         selectionMode="multiple"
                         className="w-full"
-                        onSelectionChange={(e) => change(Array.from(e).join(','), "tags")}
+                        onSelectionChange={(e) =>
+                          change(Array.from(e).join(","), "tags")
+                        }
                       >
                         {tags.map((tag) => (
                           <SelectItem key={tag}>{tag}</SelectItem>
