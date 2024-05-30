@@ -21,6 +21,10 @@ const Sidebar = () => {
 
   if (pathname == "/") return <></>;
 
+  const match = () => {
+    return /\/dashboard\/[a-z0-9]*/
+  }
+
   return (
     <div className="absolute md:static z-[5000]">
       <motion.nav
@@ -75,7 +79,7 @@ const Sidebar = () => {
               )}
             </div>
             <div className="item flex gap-2 items-center cursor-pointer relative">
-              {pathname == "/dashboard/courses" ? (
+              {/\/dashboard\/[a-z0-9]*/.test(pathname) ? (
                 <>
                   <div className="bottomsheet absolute w-1 bg-[#706fe7] h-[130%] -right-7 rounded-r-full"></div>
                   <FaBookmark className="text-xl text-[#706fe7]" />
