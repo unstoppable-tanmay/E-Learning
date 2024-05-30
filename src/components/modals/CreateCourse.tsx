@@ -13,16 +13,39 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import { courseType } from "@/types/types";
+import z, { ZodError } from "zod";
+import { toast } from "react-toastify";
+import { createCourse, updateCourse } from "@/actions/course";
+import { userAtom } from "@/atom/atom";
+import { useRecoilState } from "recoil";
 
-const CreateCourse = () => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+const courseSchema = z.object({
+  name: z.string().min(3, { message: "Name should atleast 3 character long" }),
+  description: z.string(),
+  image: z.string(),
+  price: z.string(),
+});
 
-  const [course, setCourse] = useState<courseType>({
-    name: "",
-    description: "",
-    image: "",
-    price: "",
-  });
+const CreateCourse = ({
+  update = false,
+  data,
+}: {
+  update?: boolean;
+  data?: courseType;
+}) => {
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [user, setUser] = useRecoilState(userAtom);
+
+  const [course, setCourse] = useState<courseType>(
+    !update
+      ? {
+          name: "",
+          description: "",
+          image: "",
+          price: "",
+        }
+      : data!
+  );
 
   const change = (
     value: any,
@@ -32,21 +55,55 @@ const CreateCourse = () => {
   };
 
   const handleSubmit = async () => {
-    // const res = await handleSignUp(user)
-    // console.log(res)
+    let parsedData = courseSchema.safeParse(course);
+    if (!parsedData.success) {
+      return toast(parsedData.error.errors[0].message, { type: "warning" });
+    }
+    if (!user.id) return toast("Not Signed In", { type: "error" });
+    const res = await createCourse(course, user.id!);
+    if (!res.success) toast(res.message, { type: "error" });
+    else {
+      onClose();
+      setUser({
+        ...user,
+        createdCourses: [...user.createdCourses!, res.data as courseType],
+      });
+      toast("Created", { type: "success" });
+    }
+  };
+
+  const handleUpdate = async () => {
+    let parsedData = courseSchema.safeParse(course);
+    if (!parsedData.success) {
+      return toast(parsedData.error.errors[0].message, { type: "warning" });
+    }
+    if (!user.id) return toast("Not Signed In", { type: "error" });
+    const res = await updateCourse(course, course.id!);
+    if (!res.success) toast(res.message, { type: "error" });
+    else {
+      onClose();
+      setUser({
+        ...user,
+        createdCourses: [
+          ...user.createdCourses!.filter((e) => e.id != res.data!.id),
+          res.data as courseType,
+        ],
+      });
+      toast("Updated", { type: "success" });
+    }
   };
 
   return (
     <>
       <Button onPress={onOpen} className="text-black bg-gray-300">
-        Sign Up
+        {update ? "Update Course" : "Create Course"}
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Create Course
+                {update ? "Update Course" : "Create Course"}
               </ModalHeader>
               <ModalBody>
                 <div className="wrapper flex flex-col gap-3">
@@ -73,8 +130,11 @@ const CreateCourse = () => {
                 </div>
               </ModalBody>
               <ModalFooter className="">
-                <Button color="primary" onPress={handleSubmit}>
-                  Create
+                <Button
+                  color="primary"
+                  onPress={update ? handleUpdate : handleSubmit}
+                >
+                  {update ? "Update" : "Create"}
                 </Button>
               </ModalFooter>
             </>

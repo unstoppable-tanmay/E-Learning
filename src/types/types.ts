@@ -1,38 +1,72 @@
+import { JsonValue } from "@prisma/client/runtime/library";
+
 export type userType = {
+  email?: string;
+  image?: string;
   name?: string;
-  email: string;
+
+  id?: string;
+
+  provider?: boolean;
+
   password?: string;
-  role: "ADMIN" | "USER";
+  emailVerified?: string;
+
   education?: string;
-  tags: string[];
+
+  tags: string;
+
+  recentCourseId?: string;
+
+  role: "USER" | "ADMIN";
+
+  createdCourses?: courseType[];
+  enrollments?: enrollments[];
 };
 
 export type courseType = {
   id?: string;
 
-  authorId: string;
+  authorId?: string;
   author?: userType;
 
   name: string;
   description: string;
-  price: string;
+  price?: string;
   image: string;
 
-  progress: string;
+  lessons?: lessonType[]
 };
 
 export type lessonType = {
   id?: string;
   courseId?: string;
 
+  sl: string;
+
   titel: string;
   description: string;
 
   type: "VIDEO" | "PDF" | "QUIZ";
 
-  video?: string;
-  pdf?: string;
-  quiz?: JSON;
+  video: string | null;
+  pdf: string | null;
+  quiz?: JsonValue;
 
-  additional?: string;
+  additional?: string | null;
+
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type enrollments = {
+  id: string;
+
+  userId: string;
+  courseId: string;
+
+  progress: number;
+  progressMark: string;
+
+  course?: courseType
 };

@@ -22,18 +22,16 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 
 const userSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: "Name should atleast 3 character long" }),
+  name: z.string().min(3, { message: "Name should atleast 3 character long" }),
   email: z.string().email({ message: "Not a valid email" }),
   password: z.string().min(8, { message: "Password is too small" }),
   role: z.enum(["USER", "ADMIN"]),
   education: z.string().optional(),
-  tags: z.array(z.string()),
+  tags: z.string(),
 });
 
 const Signup = () => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const [user, setUser] = useState<userType>({
     name: "",
@@ -41,7 +39,7 @@ const Signup = () => {
     password: "",
     role: "USER",
     education: "",
-    tags: [],
+    tags: "",
   });
 
   const change = (
@@ -54,12 +52,16 @@ const Signup = () => {
   const handleSubmit = async () => {
     let parsedData = userSchema.safeParse(user);
     if (!parsedData.success) {
-      console.log(parsedData.error.errors)
-      console.log(user)
+      console.log(parsedData.error.errors);
+      console.log(user);
       return toast(parsedData.error.errors[0].message, { type: "warning" });
     }
     const res = await handleSignUp(user);
     if (!res.success) toast(res.message, { type: "error" });
+    else {
+      onClose();
+      toast("Signed Up", { type: "success" });
+    }
   };
 
   return (
@@ -108,7 +110,7 @@ const Signup = () => {
                         placeholder="Select Some Tags"
                         selectionMode="multiple"
                         className="w-full"
-                        onSelectionChange={(e) => change(Array.from(e), "tags")}
+                        onSelectionChange={(e) => change(Array.from(e).join(','), "tags")}
                       >
                         {tags.map((tag) => (
                           <SelectItem key={tag}>{tag}</SelectItem>
@@ -143,7 +145,7 @@ const Signup = () => {
                         placeholder="Select Some Tags"
                         selectionMode="multiple"
                         className="w-full"
-                        onSelectionChange={(e) => change(Array.from(e), "tags")}
+                        onSelectionChange={(e) => change(Array.from(e).join(','), "tags")}
                       >
                         {tags.map((tag) => (
                           <SelectItem key={tag}>{tag}</SelectItem>

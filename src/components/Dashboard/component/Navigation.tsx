@@ -1,8 +1,17 @@
+"use client";
+import { userAtom } from "@/atom/atom";
 import { Avatar } from "@nextui-org/react";
 import Link from "next/link";
 import React from "react";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowBack } from "react-icons/io";
+import { useRecoilState } from "recoil";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Button,
+} from "@nextui-org/react";
 
 type Props = {
   link: string;
@@ -12,6 +21,7 @@ type Props = {
 };
 
 const Navigation = ({ link, lebel, search = true, account = true }: Props) => {
+  const [user, setUser] = useRecoilState(userAtom);
   return (
     <nav className="left w-full items-center flex px-2 pr-4 py-2 justify-between">
       <Link
@@ -24,7 +34,22 @@ const Navigation = ({ link, lebel, search = true, account = true }: Props) => {
       <div className="right flex items-center gap-4">
         {search && <CiSearch className="text-2xl cursor-pointer" />}
         {account && (
-          <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026024d" className="cursor-pointer" />
+          <Popover placement="right">
+            <PopoverTrigger>
+              <Avatar
+                name={user.name}
+                className="cursor-pointer"
+              />
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="px-1 py-2">
+                <div className="text-small font-bold">{user.name}</div>
+                <div className="text-tiny">{user.email}</div>
+                <div className="education">{user.education}</div>
+                <div className="tags">{user.tags}</div>
+              </div>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
     </nav>

@@ -7,6 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                 String    @id @default(cuid())
+  userId             String
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
+}
+
 enum Role {
   ADMIN
   USER
@@ -17,20 +55,28 @@ model User {
 
   provider Boolean @default(false)
 
-  name     String? @default("Harry") @db.VarChar(255)
-  email    String  @unique @db.VarChar(255)
-  password String? @db.VarChar(255)
+  name          String?   @default("Harry") @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  password      String?   @db.VarChar(255)
+  emailVerified DateTime?
+  image         String?
 
   education String?
 
   tags String?
 
+  recentCourseId String?
+
   role Role @default(USER)
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   createdCourses Course[]
   enrollments    Enrollment[]
+
+  accounts Account[]
+  sessions Session[]
 }
 
 model Course {
@@ -38,9 +84,9 @@ model Course {
   authorId String
 
   name        String @db.VarChar(255)
-  description String @db.VarChar(255)
-  price       Int
-  image       String @db.VarChar(255)
+  description String @db.VarChar(400)
+  price       String
+  image       String @db.VarChar(400)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,18 +102,17 @@ model Enrollment {
 
   userId   String @unique
   courseId String @unique
-  lessonId String @unique
 
   progress Float @default(0.0) // Represents the progress percentage
+  progressMark String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   user   User   @relation(fields: [userId], references: [id])
   course Course @relation(fields: [courseId], references: [id])
-  lesson Lesson @relation(fields: [lessonId], references: [id])
 
-  @@unique([userId, courseId, lessonId]) // Ensure a user can enroll in a lesson within a course only once
+  @@unique([userId, courseId]) // Ensure a user can enroll in a lesson within a course only once
 }
 
 enum LessonType {
@@ -80,6 +125,8 @@ model Lesson {
   id       String @id @default(cuid())
   courseId String
 
+  sl String @unique
+
   titel       String
   description String
 
@@ -89,11 +136,10 @@ model Lesson {
   pdf   String?
   quiz  Json?
 
-  additional String
+  additional String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  course     Course      @relation(fields: [courseId], references: [id])
-  enrollments Enrollment[]
+  course      Course       @relation(fields: [courseId], references: [id])
 }

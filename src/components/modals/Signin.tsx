@@ -13,11 +13,15 @@ import {
   Tabs,
   Tab,
 } from "@nextui-org/react";
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle, FaUnlockAlt } from "react-icons/fa";
 import { signIn } from "next-auth/react";
+import { FaLock, FaUnlock } from "react-icons/fa6";
 
 const Signin = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   const [user, setUser] = useState({
     email: "",
@@ -29,7 +33,10 @@ const Signin = () => {
   };
 
   const handleSubmit = () => {
-    console.log(user);
+    signIn("credentials", {
+      email: user.email,
+      password: user.password,
+    });
   };
   const handleGoogleSignin = () => {
     signIn("google");
@@ -49,12 +56,27 @@ const Signin = () => {
               </ModalHeader>
               <ModalBody>
                 <Input
+                  type="email"
                   placeholder="Email"
                   value={user.email}
                   onChange={(e) => change(e.target.value, "email")}
                 ></Input>
                 <Input
                   placeholder="Password"
+                  endContent={
+                    <button
+                      className="focus:outline-none"
+                      type="button"
+                      onClick={toggleVisibility}
+                    >
+                      {isVisible ? (
+                        <FaUnlock className="text-xl text-default-400 pointer-events-none" />
+                      ) : (
+                        <FaLock className="text-xl text-default-400 pointer-events-none" />
+                      )}
+                    </button>
+                  }
+                  type={isVisible ? "text" : "password"}
                   value={user.password}
                   onChange={(e) => change(e.target.value, "password")}
                 ></Input>

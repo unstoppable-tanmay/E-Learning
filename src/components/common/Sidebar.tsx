@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { userAtom } from "@/atom/atom";
 import { motion } from "framer-motion";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BsFillGridFill,
   BsFillPlayBtnFill,
@@ -14,19 +16,25 @@ import {
 import { FaArrowLeft, FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { HiMenuAlt1 } from "react-icons/hi";
 import { HiCog6Tooth, HiOutlineCog6Tooth } from "react-icons/hi2";
+import { IoLogOut } from "react-icons/io5";
+import { useRecoilState } from "recoil";
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
+  const [user, setUser] = useRecoilState(userAtom);
+
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < 768) setOpen(false);
+      else setOpen(true);
+    });
+  }, []);
 
   if (pathname == "/") return <></>;
 
-  const match = () => {
-    return /\/dashboard\/[a-z0-9]*/
-  }
-
   return (
-    <div className="absolute md:static z-[5000]">
+    <div className="absolute md:static z-[1000]">
       <motion.nav
         animate={open ? { marginLeft: "0px" } : { marginLeft: "-250px" }}
         transition={{ bounce: 0.15 }}
@@ -48,7 +56,7 @@ const Sidebar = () => {
                   pointerEvents: "all",
                 }
           }
-          className="hamburger absolute top-4 -z-0"
+          className="hamburger absolute top-4 -z-0 flex lg:hidden"
           onClick={(e) => setOpen(true)}
         >
           <HiMenuAlt1 className="text-2xl" />
@@ -57,7 +65,7 @@ const Sidebar = () => {
           <div className="heading font-semibold text-2xl flex items-center justify-between">
             E-Learn
             <FaArrowLeft
-              className="text-xl cursor-pointer text-[#aaabaf]"
+              className="text-xl cursor-pointer text-[#aaabaf] flex lg:hidden"
               onClick={(e) => {
                 setOpen(false);
               }}
@@ -72,37 +80,65 @@ const Sidebar = () => {
                   <span className="text-[#706fe7]">Dashboard</span>
                 </>
               ) : (
-                <Link href={'/dashboard'} className="w-full flex items-center gap-2">
+                <Link
+                  href={"/dashboard"}
+                  className="w-full flex items-center gap-2"
+                >
                   <BsGrid className="text-xl" />
                   <span className="text-[#aaabaf]">Dashboard</span>
                 </Link>
               )}
             </div>
             <div className="item flex gap-2 items-center cursor-pointer relative">
-              {/\/dashboard\/[a-z0-9]*/.test(pathname) ? (
+              {/\/dashboard\/[a-z0-9]*/.test(pathname) &&
+              pathname != "/dashboard/settings" &&
+              pathname != "/dashboard/courses" ? (
                 <>
                   <div className="bottomsheet absolute w-1 bg-[#706fe7] h-[130%] -right-7 rounded-r-full"></div>
                   <FaBookmark className="text-xl text-[#706fe7]" />
-                  <span className="text-[#706fe7]">My Courses</span>
+                  <span className="text-[#706fe7]">{user.role=="USER"?"Playing":"Creating"}</span>
                 </>
               ) : (
-                <Link href={'/dashboard/courses'} className="w-full flex items-center gap-2">
+                <Link
+                  href={"/dashboard"} // TODO dashboard/[recentcourseid]
+                  className="w-full flex items-center gap-2"
+                >
                   <FaRegBookmark className="text-xl" />
-                  <span className="text-[#aaabaf]">My Courses</span>
+                  <span className="text-[#aaabaf]">{user.role=="USER"?"Playing":"Creating"}</span>
                 </Link>
               )}
             </div>
-            <div className="item flex gap-2 items-center cursor-pointer relative">
-              {pathname == "/courses" ? (
+            {user.role=="USER"&&<div className="item flex gap-2 items-center cursor-pointer relative">
+              {pathname == "/dashboard/courses" ? (
                 <>
                   <div className="bottomsheet absolute w-1 bg-[#706fe7] h-[130%] -right-7 rounded-r-full"></div>
                   <BsFillPlayBtnFill className="text-xl text-[#706fe7]" />
                   <span className="text-[#706fe7]">All Courses</span>
                 </>
               ) : (
-                <Link href={'/courses'} className="w-full flex items-center gap-2">
+                <Link
+                  href={"/dashboard/courses"}
+                  className="w-full flex items-center gap-2"
+                >
                   <BsPlayBtn className="text-xl" />
                   <span className="text-[#aaabaf]">All Courses</span>
+                </Link>
+              )}
+            </div>}
+            <div className="item flex gap-2 items-center cursor-pointer relative">
+              {pathname == "/dashboard/settings" ? (
+                <>
+                  <div className="bottomsheet absolute w-1 bg-[#706fe7] h-[130%] -right-7 rounded-r-full"></div>
+                  <HiCog6Tooth className="text-xl text-[#706fe7]" />
+                  <span className="text-[#706fe7]">Settings</span>
+                </>
+              ) : (
+                <Link
+                  href={"/dashboard/settings"}
+                  className="w-full flex items-center gap-2"
+                >
+                  <HiOutlineCog6Tooth className="text-xl" />
+                  <span className="text-[#aaabaf]">Settings</span>
                 </Link>
               )}
             </div>
@@ -122,19 +158,11 @@ const Sidebar = () => {
               Upgrade
             </div>
           </div>
-          <div className="item flex gap-2 items-center cursor-pointer relative">
-            {pathname == "/settings" ? (
-              <>
-                <div className="bottomsheet absolute w-1 bg-[#706fe7] h-[130%] -right-7 rounded-r-full"></div>
-                <HiCog6Tooth className="text-xl text-[#706fe7]" />
-                <span className="text-[#706fe7]">Settings</span>
-              </>
-            ) : (
-              <Link href={'/settings'} className="w-full flex items-center gap-2">
-                <HiOutlineCog6Tooth className="text-xl" />
-                <span className="text-[#aaabaf]">Settings</span>
-              </Link>
-            )}
+          <div className="item flex gap-2 items-center cursor-pointer relative mb-3" onClick={e=>{
+            signOut()
+          }}>
+            <IoLogOut className="text-xl text-red-400" />
+            <span className="text-red-400">LogOut</span>
           </div>
         </div>
       </motion.nav>

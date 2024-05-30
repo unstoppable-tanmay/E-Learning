@@ -11,7 +11,7 @@ const userSchema = z.object({
   password: z.string().min(8, { message: "Password is too small" }),
   role: z.enum(["USER", "ADMIN"]),
   education: z.string().optional(),
-  tags: z.array(z.string()),
+  tags: z.string(),
 });
 
 export const handleSignUp = async (user: userType) => {
@@ -23,11 +23,12 @@ export const handleSignUp = async (user: userType) => {
 
     const newUser = await prisma.user.create({
       data: {
-        email: user.email,
+        email: user.email!,
         password: hashSync(user.password!, 10),
         name: user.name!,
         role: user.role,
         education: user.education ?? null,
+        tags: user.tags,
       },
     });
 

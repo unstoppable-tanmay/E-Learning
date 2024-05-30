@@ -5,6 +5,8 @@ import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../../../prisma/prisma";
 import { compareSync } from "bcrypt";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,19 +17,24 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (typeof credentials !== "undefined") {
-          const user = await prisma.user.findFirst({
-            where: {
-              email: credentials.email,
-            },
-          });
-          if (!user) return null;
-          if (compareSync(credentials.password, user?.password!))
-            return { id: user.id, name: user.name, email: credentials.email };
-          else return null;
-        } else {
-          return null;
-        }
+        console.log(
+          "======================================================================="
+        );
+        // if (typeof credentials !== "undefined") {
+        console.log(credentials);
+        const user = await prisma.user.findFirst({
+          where: {
+            email: credentials!.email,
+          },
+        });
+        console.log(user);
+        if (!user) return null;
+        if (compareSync(credentials!.password, user?.password!))
+          return { id: user.id, name: user.name, email: credentials!.email };
+        else return null;
+        // } else {
+        //   return null;
+        // }
       },
     }),
     GoogleProvider({
@@ -37,15 +44,30 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async session({ user, session, token }) {
+      console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
       const userData = await prisma.user.findFirst({
-        where: { email: user.email },
+        where: { email: session.user!.email! },
+        include: {
+          createdCourses: true,
+          enrollments: {
+            include: {
+              course: true,
+            },
+          },
+        },
       });
       if (!userData) {
         return { ...user, ...session, ...token, userIsExit: false };
       }
-      return { ...user, ...session, ...token, ...userData };
+      return {
+        ...user,
+        ...session,
+        ...token,
+        data: userData,
+      };
     },
     async signIn({ email, credentials, user, account, profile }) {
+      console.log("-------------------------------------------------------");
       let userExits = await prisma.user.findFirst({
         where: { email: profile?.email },
       });
@@ -68,13 +90,14 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: "tanmay",
-  events: {},
   pages: {
     signIn: "/dashboard",
     signOut: "/",
-    error: "/",
-    newUser: "/new-user",
+    error: "/error",
   },
+  adapter: PrismaAdapter(prisma),
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
