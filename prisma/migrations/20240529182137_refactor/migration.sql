@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `education` VARCHAR(191) NULL,
+    ADD COLUMN `provider` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `tags` VARCHAR(191) NULL,
+    MODIFY `name` VARCHAR(255) NULL DEFAULT 'Harry',
+    MODIFY `password` VARCHAR(255) NULL;

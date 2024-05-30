@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id String @id @default(cuid())
+
+  provider Boolean @default(false)
+
+  name     String? @default("Harry") @db.VarChar(255)
+  email    String  @unique @db.VarChar(255)
+  password String? @db.VarChar(255)
+
+  education String?
+
+  tags String?
+
+  role Role @default(USER)
+
+  createdAt DateTime @default(now())
+
+  createdCourses Course[]
+  enrollments    Enrollment[]
+}
+
+model Course {
+  id       String @id @default(cuid())
+  authorId String
+
+  name        String @db.VarChar(255)
+  description String @db.VarChar(255)
+  price       Int
+  image       String @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User @relation(fields: [authorId], references: [id])
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id String @id @default(cuid())
+
+  userId   String @unique
+  courseId String @unique
+  lessonId String @unique
+
+  progress Float @default(0.0) // Represents the progress percentage
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([userId, courseId, lessonId]) // Ensure a user can enroll in a lesson within a course only once
+}
+
+enum LessonType {
+  VIDEO
+  PDF
+  QUIZ
+}
+
+model Lesson {
+  id       String @id @default(cuid())
+  courseId String
+
+  titel       String
+  description String
+
+  type LessonType
+
+  video String?
+  pdf   String?
+  quiz  Json?
+
+  additional String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course     Course      @relation(fields: [courseId], references: [id])
+  enrollments Enrollment[]
+}
