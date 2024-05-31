@@ -98,13 +98,14 @@ const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 3 * 24 * 60 * 60,
   },
   secret: "tanmay",
   pages: {
     signIn: "/dashboard",
     signOut: "/",
     error: "/error",
-  },
+  }, 
   adapter: PrismaAdapter(prisma),
 };
 
