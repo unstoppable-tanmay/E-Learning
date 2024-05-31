@@ -29,6 +29,10 @@ const Sidebar = () => {
       if (window.innerWidth < 768) setOpen(false);
       else setOpen(true);
     });
+    window.addEventListener("load", () => {
+      if (window.innerWidth < 768) setOpen(false);
+      else setOpen(true);
+    });
   }, []);
 
   if (pathname == "/") return <></>;

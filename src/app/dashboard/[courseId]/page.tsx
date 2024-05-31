@@ -124,7 +124,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
           <Swiper
             modules={[NavigationModule]}
             centeredSlides
-            loop
+            // loop
             autoplay
             className="w-full select-none mask-class"
             breakpoints={{
