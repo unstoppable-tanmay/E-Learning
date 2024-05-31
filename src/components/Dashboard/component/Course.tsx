@@ -12,6 +12,8 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  Chip,
+  Avatar,
 } from "@nextui-org/react";
 import { enrollCourse } from "@/actions/course";
 import { toast } from "react-toastify";
@@ -33,6 +35,7 @@ const Course = ({
     if (!res.success) return toast("Some Error Happened", { type: "error" });
     toast("Purchased SuccesFully");
     onClose();
+    setUser({...user,enrollments:[...user.enrollments??[],res.data!]})
     router.push("/dashboard/" + data.id!);
   };
 
@@ -49,8 +52,12 @@ const Course = ({
           alt=""
           className="w-full h-full object-cover rounded-lg bg-black/5 group-hover:scale-110 duration-200 z-0"
         />
-        <div className="absolute w-full h-full bg-black/70 z-10 text-white">
-          Author
+        <div className="absolute w-full h-full top-0 left-0 bg-gradient-to-b from-black via-transparent to-black z-[200] text-white hover:opacity-0 duration-200">
+          <div className="wrapper w-full h-full relative">
+            <div className="authorname absolute top-2 left-2">
+              <Chip>{data.price}</Chip>
+            </div>
+          </div>
         </div>
       </div>
       <div className="title font-semibold text-lg">{data.name}</div>
@@ -70,8 +77,15 @@ const Course = ({
             alt=""
             className="w-full h-full object-cover rounded-lg bg-black/5 group-hover:scale-110 duration-200 z-0"
           />
-          <div className="absolute w-full h-full bg-black/70 z-10 text-white">
-            Author
+          <div className="absolute w-full h-full top-0 left-0 bg-gradient-to-b from-black via-transparent to-black text-white hover:opacity-70 duration-200">
+            <div className="wrapper w-full h-full relative">
+              <div className="authorname absolute top-2 left-2">
+                <Chip>{data.price}</Chip>
+              </div>
+              <div className="authorname absolute top-2 right-2">
+                <Avatar name={data.author?.name!} size="sm"/>
+              </div>
+            </div>
           </div>
         </div>
         <div className="title font-semibold text-lg">{data.name}</div>

@@ -51,7 +51,17 @@ const authOptions: NextAuthOptions = {
           createdCourses: true,
           enrollments: {
             include: {
-              course: true,
+              course: {
+                include:{
+                  author:{
+                    select:{
+                      name:true,
+                      email:true,
+                      education:true
+                    }
+                  }
+                }
+              },
             },
           },
         },

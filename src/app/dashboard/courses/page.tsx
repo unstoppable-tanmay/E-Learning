@@ -52,23 +52,6 @@ const Page = () => {
           {courses.map((e, i) => {
             return <Course key={i} data={e} />;
           })}
-          {/* <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course />
-          <Course /> */}
         </div>
       </div>
     </section>

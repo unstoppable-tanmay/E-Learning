@@ -72,6 +72,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                 height={"100%"}
                 controls
                 url={playingLesson.video!}
+                playing={false}
               />
             )}
             {playingLesson?.type == "PDF" && (
@@ -149,7 +150,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
               },
             }}
           >
-            {course?.lessons?.map((e, i) => {
+            {course?.lessons && course?.lessons.sort((a,b)=>Number(a.sl)-Number(b.sl))?.map((e, i) => {
               return (
                 <SwiperSlide
                   key={i}
@@ -195,7 +196,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
         </div>
       </div>
       <div className="lessons flex flex-col gap-4 items-center w-[90%] md:w-[70%] mt-6 flex-1 overflow-y-scroll">
-        {course?.lessons?.map((e, i) => {
+        {course?.lessons?.sort((a,b)=>Number(a.sl)-Number(b.sl)).map((e, i) => {
           return (
             <div
               key={i}
@@ -208,6 +209,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                     height={"100%"}
                     controls
                     url={e.video!}
+                    playing={false}
                   />
                 </div>
               )}

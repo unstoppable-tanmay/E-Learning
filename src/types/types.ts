@@ -1,9 +1,9 @@
 import { JsonValue } from "@prisma/client/runtime/library";
 
 export type userType = {
-  email?: string;
-  image?: string;
-  name?: string;
+  email?: string | null;
+  image?: string | null;
+  name?: string | null;
 
   id?: string;
 
@@ -12,13 +12,13 @@ export type userType = {
   password?: string;
   emailVerified?: string;
 
-  education?: string;
+  education?: string | null;
 
-  tags: string;
+  tags?: string;
 
   recentCourseId?: string;
 
-  role: "USER" | "ADMIN";
+  role?: "USER" | "ADMIN";
 
   createdCourses?: courseType[];
   enrollments?: enrollments[];

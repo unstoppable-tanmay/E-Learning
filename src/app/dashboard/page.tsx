@@ -80,7 +80,7 @@ const Page = () => {
             <div className="item flex gap-2 font-medium items-center">
               <CircularProgress
                 size="md"
-                value={user.enrollments?.reduce((p, c) => p + c.progress, 0)}
+                value={user.enrollments?.length?user.enrollments?.reduce((p, c) => p + c.progress, 0):0}
                 color="success"
                 showValueLabel={true}
                 maxValue={user.enrollments?.length}

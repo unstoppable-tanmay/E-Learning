@@ -84,7 +84,7 @@ export const deleteCourse = async (courseId: string) => {
   }
 };
 
-export const getCourse = async (courseId: string,userId:string) => {
+export const getCourse = async (courseId: string, userId: string) => {
   try {
     const data = await prisma.course.findFirst({
       where: {
@@ -92,12 +92,25 @@ export const getCourse = async (courseId: string,userId:string) => {
       },
       include: {
         lessons: true,
-        enrollments:{
-          where:{
+        enrollments: {
+          where: {
             courseId,
-            userId
-          }
-        }
+            userId,
+          },
+          include: {
+            course: {
+              include: {
+                author: {
+                  select: {
+                    name: true,
+                    email: true,
+                    education: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
