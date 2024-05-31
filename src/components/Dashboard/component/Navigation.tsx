@@ -37,7 +37,7 @@ const Navigation = ({ link, lebel, search = true, account = true }: Props) => {
           <Popover placement="right">
             <PopoverTrigger>
               <Avatar
-                name={user.name}
+                name={user.name!}
                 className="cursor-pointer"
               />
             </PopoverTrigger>

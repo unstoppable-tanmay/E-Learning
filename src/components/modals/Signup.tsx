@@ -90,7 +90,7 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
                     <div className="wrapper flex flex-col gap-3">
                       <Input
                         placeholder="Email"
-                        value={user.email}
+                        value={user.email!}
                         onChange={(e) => change(e.target.value, "email")}
                       ></Input>
                       <Input
@@ -100,12 +100,12 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
                       ></Input>
                       <Input
                         placeholder="Name"
-                        value={user.name}
+                        value={user.name!}
                         onChange={(e) => change(e.target.value, "name")}
                       ></Input>
                       <Input
                         placeholder="Education"
-                        value={user.education}
+                        value={user.education!}
                         onChange={(e) => change(e.target.value, "education")}
                       ></Input>
 
@@ -128,7 +128,7 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
                     <div className="wrapper flex flex-col gap-3">
                       <Input
                         placeholder="Email"
-                        value={user.email}
+                        value={user.email!}
                         onChange={(e) => change(e.target.value, "email")}
                       ></Input>
                       <Input
@@ -138,12 +138,12 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
                       ></Input>
                       <Input
                         placeholder="Name"
-                        value={user.name}
+                        value={user.name!}
                         onChange={(e) => change(e.target.value, "name")}
                       ></Input>
                       <Input
                         placeholder="Education"
-                        value={user.education}
+                        value={user.education!}
                         onChange={(e) => change(e.target.value, "education")}
                       ></Input>
                       <Select
