@@ -98,13 +98,13 @@ model Course {
 }
 
 model Enrollment {
-  id String @id @default(cuid())
+  // id String @id @default(cuid())
 
-  userId   String @unique
-  courseId String @unique
+  userId   String
+  courseId String
 
-  progress Float @default(0.0) // Represents the progress percentage
-  progressMark String
+  progress     Float  @default(0.0) // Represents the progress percentage
+  progressMark String? @default("")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -112,7 +112,7 @@ model Enrollment {
   user   User   @relation(fields: [userId], references: [id])
   course Course @relation(fields: [courseId], references: [id])
 
-  @@unique([userId, courseId]) // Ensure a user can enroll in a lesson within a course only once
+  @@id(fields: [userId, courseId]) // Ensure a user can enroll in a lesson within a course only once
 }
 
 enum LessonType {
@@ -125,7 +125,7 @@ model Lesson {
   id       String @id @default(cuid())
   courseId String
 
-  sl String @unique
+  sl String
 
   titel       String
   description String
@@ -141,5 +141,5 @@ model Lesson {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  course      Course       @relation(fields: [courseId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
 }

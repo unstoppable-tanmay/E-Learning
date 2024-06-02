@@ -84,6 +84,43 @@ export const deleteCourse = async (courseId: string) => {
   }
 };
 
+export const getPurchasedCourse = async (userId:string) => {
+  try {
+    const data = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select:{
+        enrollments:{
+          select:{
+            course:true
+          }
+        }
+      }
+    });
+
+    return { success: true, data: data, message: "" };
+  } catch (error) {
+    return { success: false, data: null, message: "Internal Error" };
+  }
+}
+export const getCreatedCourse = async (userId:string) => {
+  try {
+    const data = await prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select:{
+        createdCourses:true
+      }
+    });
+
+    return { success: true, data: data, message: "" };
+  } catch (error) {
+    return { success: false, data: null, message: "Internal Error" };
+  }
+}
+
 export const getCourse = async (courseId: string, userId: string) => {
   try {
     const data = await prisma.course.findFirst({
@@ -128,13 +165,11 @@ export const getSomeCourse = async (search: string = "", userId?: string) => {
           contains: search,
           startsWith: search,
         },
-        NOT: {
-          enrollments: {
-            some: {
-              userId,
-            },
-          },
-        },
+        // enrollments: {
+        //   none: {
+        //     userId
+        //   },
+        // },
       },
     });
 
@@ -148,14 +183,14 @@ export const enrollCourse = async (courseId: string, userId: string) => {
   try {
     const data = await prisma.enrollment.create({
       data: {
-        userId,
         courseId,
-        progressMark: "",
+        userId,
       },
     });
 
     return { success: true, data: data, message: "" };
   } catch (error) {
+    console.log(error)
     return { success: false, data: null, message: "Internal Error" };
   }
 };
@@ -175,8 +210,10 @@ export const progressMarkr = async (
     // })
     const data = await prisma.enrollment.update({
       where: {
-        courseId,
-        userId,
+        userId_courseId: {
+          userId,
+          courseId
+        },
       },
       data: {
         progress: {

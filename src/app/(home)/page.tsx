@@ -15,7 +15,7 @@ export default function Home() {
   useEffect(() => {
     console.log(session);
     if (session.status == "authenticated") {
-      toast.error("You are already logged in");
+      // toast.error("You are already logged in");
       redirect("/dashboard");
     }
   }, [session]);

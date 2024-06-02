@@ -52,15 +52,15 @@ const authOptions: NextAuthOptions = {
           enrollments: {
             include: {
               course: {
-                include:{
-                  author:{
-                    select:{
-                      name:true,
-                      email:true,
-                      education:true
-                    }
-                  }
-                }
+                include: {
+                  author: {
+                    select: {
+                      name: true,
+                      email: true,
+                      education: true,
+                    },
+                  },
+                },
               },
             },
           },
@@ -105,7 +105,7 @@ const authOptions: NextAuthOptions = {
     signIn: "/dashboard",
     signOut: "/",
     error: "/error",
-  }, 
+  },
   adapter: PrismaAdapter(prisma),
 };
 

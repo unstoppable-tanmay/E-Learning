@@ -46,7 +46,7 @@ const Course = ({
       href={"/dashboard/" + data.id}
       className="w-[clamp(100px,250px,90vw)] flex flex-col gap-1 cursor-pointer"
     >
-      <div className="img-wrapper w-full aspect-[1/.6] relative group overflow-hidden rounded-lg">
+      <div className="img-wrapper w-full aspect-[1/.6] relative group overflow-hidden rounded-lg bg-black">
         <img
           src={data.image}
           alt=""

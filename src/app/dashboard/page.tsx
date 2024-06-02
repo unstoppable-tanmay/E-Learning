@@ -1,19 +1,41 @@
 "use client";
 
+import { getCreatedCourse, getPurchasedCourse } from "@/actions/course";
 import { userAtom } from "@/atom/atom";
 import Course from "@/components/Dashboard/component/Course";
 import Navigation from "@/components/Dashboard/component/Navigation";
 import CreateCourse from "@/components/modals/CreateCourse";
+import { courseType, enrollments } from "@/types/types";
 import { Button, CircularProgress, Divider } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 
 const Page = () => {
   const session = useSession();
   const [user, setUser] = useRecoilState(userAtom);
+  const [purchasedCourse, setPurchasedCourse] = useState<courseType[]>([]);
+  const [createdCourse, setCreatedCourse] = useState<courseType[]>([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      if (user.role == "ADMIN" && user.id) {
+        let data = await getCreatedCourse(user.id!);
+        console.log(data)
+        if (data.success) setCreatedCourse(data.data?.createdCourses!);
+      } else {
+        let data = await getPurchasedCourse(user.id!);
+        console.log(data)
+        if (data.success)
+          setPurchasedCourse(data.data?.enrollments.map((e) => e.course)!);
+      }
+    };
+    if (user.id) {
+      getData();
+    }
+  }, [user]);
 
   console.log(user);
 
@@ -36,40 +58,33 @@ const Page = () => {
       <div className="flex gap-3 overflow-y-scroll flex-1">
         <div className="courses-container flex flex-wrap gap-6 md:gap-16 w-full justify-evenly  overflow-y-scroll p-3">
           {user.role == "ADMIN" ? (
-            user.createdCourses ? (
-              user.createdCourses.length ? (
-                user.createdCourses.map((e, i) => {
+            (
+              createdCourse.length ? (
+                createdCourse.map((e, i) => {
                   return <Course key={i} data={e} />;
                 })
               ) : (
-                "No Data Found"
+                <>
+                  <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
+                    No Data Found
+                    <CreateCourse />
+                  </div>
+                </>
               )
-            ) : (
-              <>
-                <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
-                  No Data Found
-                  <CreateCourse />
-                </div>
-              </>
-            )
-          ) : user.enrollments ? (
-            user.enrollments.length ? (
-              user.enrollments.map((e, i) => {
-                // return <></>;
-                return <Course key={i} data={e.course!} purchase />;
-              })
-            ) : (
-              <>
-                <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
-                  No Data Found
-                  <Link href={"/dashboard/courses"}>
-                    <Button>Purchase Course</Button>
-                  </Link>
-                </div>
-              </>
-            )
+            ) 
+          ) : purchasedCourse.length ? (
+            purchasedCourse.map((e, i) => {
+              return <Course key={i} data={e} purchase />;
+            })
           ) : (
-            <>No Data Found</>
+            <>
+              <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
+                No Data Found
+                <Link href={"/dashboard/courses"}>
+                  <Button>Purchase Course</Button>
+                </Link>
+              </div>
+            </>
           )}
         </div>
         {user.role == "USER" && (
@@ -80,7 +95,11 @@ const Page = () => {
             <div className="item flex gap-2 font-medium items-center">
               <CircularProgress
                 size="md"
-                value={user.enrollments?.length?user.enrollments?.reduce((p, c) => p + c.progress, 0):0}
+                value={
+                  user.enrollments?.length
+                    ? user.enrollments?.reduce((p, c) => p + c.progress, 0)
+                    : 0
+                }
                 color="success"
                 showValueLabel={true}
                 maxValue={user.enrollments?.length}

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import SessionWrapper from "@/providers/NextAuthProvider";
 import Sidebar from "@/components/common/Sidebar";
+import AuthChecker from "@/providers/AuthCheckers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SessionWrapper>
-          {children}
-        </SessionWrapper>
+        <SessionWrapper>{children}</SessionWrapper>
       </body>
     </html>
   );

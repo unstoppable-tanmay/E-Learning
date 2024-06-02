@@ -35,7 +35,7 @@ const Sidebar = () => {
     });
   }, []);
 
-  if (pathname == "/") return <></>;
+  // if (pathname == "/" || user == undefined) return <></>;
 
   return (
     <div className="absolute md:static z-[1000]">

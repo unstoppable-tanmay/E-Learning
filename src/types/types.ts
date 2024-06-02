@@ -60,13 +60,13 @@ export type lessonType = {
 };
 
 export type enrollments = {
-  id: string;
+  // id: string;
 
   userId: string;
   courseId: string;
 
   progress: number;
-  progressMark: string;
+  progressMark: string | null;
 
   course?: courseType
 };
