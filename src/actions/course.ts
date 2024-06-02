@@ -84,42 +84,42 @@ export const deleteCourse = async (courseId: string) => {
   }
 };
 
-export const getPurchasedCourse = async (userId:string) => {
+export const getPurchasedCourse = async (userId: string) => {
   try {
     const data = await prisma.user.findFirst({
       where: {
         id: userId,
       },
-      select:{
-        enrollments:{
-          select:{
-            course:true
-          }
-        }
-      }
+      select: {
+        enrollments: {
+          select: {
+            course: true,
+          },
+        },
+      },
     });
 
     return { success: true, data: data, message: "" };
   } catch (error) {
     return { success: false, data: null, message: "Internal Error" };
   }
-}
-export const getCreatedCourse = async (userId:string) => {
+};
+export const getCreatedCourse = async (userId: string) => {
   try {
     const data = await prisma.user.findFirst({
       where: {
         id: userId,
       },
-      select:{
-        createdCourses:true
-      }
+      select: {
+        createdCourses: true,
+      },
     });
 
     return { success: true, data: data, message: "" };
   } catch (error) {
     return { success: false, data: null, message: "Internal Error" };
   }
-}
+};
 
 export const getCourse = async (courseId: string, userId: string) => {
   try {
@@ -171,6 +171,9 @@ export const getSomeCourse = async (search: string = "", userId?: string) => {
         //   },
         // },
       },
+      include: {
+        lessons: true,
+      },
     });
 
     return { success: true, data: data, message: "" };
@@ -190,7 +193,7 @@ export const enrollCourse = async (courseId: string, userId: string) => {
 
     return { success: true, data: data, message: "" };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return { success: false, data: null, message: "Internal Error" };
   }
 };
@@ -212,14 +215,14 @@ export const progressMarkr = async (
       where: {
         userId_courseId: {
           userId,
-          courseId
+          courseId,
         },
       },
       data: {
         progress: {
           increment: 1,
         },
-        progressMark: enrollment?.progressMark + "," + lessonsNo,
+        progressMark: enrollment?.progressMark + enrollment.progressMark! ? "," :"" + lessonsNo,
       },
     });
 

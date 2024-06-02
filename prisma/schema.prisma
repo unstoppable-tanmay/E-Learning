@@ -8,19 +8,23 @@ datasource db {
 }
 
 model Account {
-  id                 String    @id @default(cuid())
-  userId             String
-  providerType       String
-  providerId         String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id])
+  id                String    @id @default(cuid())
+  userId            String  
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.LongText
+  access_token      String? @db.LongText
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.LongText
+  session_state     String?
 
-  @@unique([providerId, providerAccountId])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
@@ -29,9 +33,12 @@ model Session {
   expires      DateTime
   sessionToken String   @unique
   accessToken  String   @unique
+  role         String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model VerificationRequest {
@@ -45,29 +52,18 @@ model VerificationRequest {
   @@unique([identifier, token])
 }
 
-enum Role {
-  ADMIN
-  USER
-}
-
 model User {
-  id String @id @default(cuid())
-
-  provider Boolean @default(false)
-
-  name          String?   @default("Harry") @db.VarChar(255)
-  email         String    @unique @db.VarChar(255)
-  password      String?   @db.VarChar(255)
-  emailVerified DateTime?
-  image         String?
-
-  education String?
-
-  tags String?
-
+  id             String    @id @default(cuid())
+  provider       Boolean   @default(false)
+  name           String?   @default("Harry") @db.VarChar(255)
+  email          String    @unique @db.VarChar(255)
+  password       String?   @db.VarChar(255)
+  emailVerified  DateTime? @map("email_verified")
+  image          String?
+  education      String?
+  tags           String?
   recentCourseId String?
-
-  role Role @default(USER)
+  role           Role      @default(USER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -80,66 +76,60 @@ model User {
 }
 
 model Course {
-  id       String @id @default(cuid())
-  authorId String
-
-  name        String @db.VarChar(255)
-  description String @db.VarChar(400)
+  id          String       @id @default(cuid())
+  authorId    String
+  name        String       @db.VarChar(255)
+  description String       @db.VarChar(400)
   price       String
-  image       String @db.VarChar(400)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  author User @relation(fields: [authorId], references: [id])
-
-  lessons     Lesson[]
+  image       String       @db.VarChar(400)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  author      User         @relation(fields: [authorId], references: [id])
   enrollments Enrollment[]
+  lessons     Lesson[]
+
+  @@index([authorId], map: "Course_authorId_fkey")
 }
 
 model Enrollment {
-  // id String @id @default(cuid())
+  userId       String
+  courseId     String
+  progress     Float    @default(0)
+  progressMark String?  @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+  course       Course   @relation(fields: [courseId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
 
-  userId   String
-  courseId String
+  @@id([userId, courseId])
+  @@index([courseId], map: "Enrollment_courseId_fkey")
+}
 
-  progress     Float  @default(0.0) // Represents the progress percentage
-  progressMark String? @default("")
+model Lesson {
+  id          String     @id @default(cuid())
+  courseId    String
+  sl          String
+  titel       String
+  description String
+  type        LessonType
+  video       String?
+  pdf         String?
+  quiz        Json?
+  additional  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  course      Course     @relation(fields: [courseId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  @@index([courseId], map: "Lesson_courseId_fkey")
+}
 
-  user   User   @relation(fields: [userId], references: [id])
-  course Course @relation(fields: [courseId], references: [id])
-
-  @@id(fields: [userId, courseId]) // Ensure a user can enroll in a lesson within a course only once
+enum Role {
+  ADMIN
+  USER
 }
 
 enum LessonType {
   VIDEO
   PDF
   QUIZ
-}
-
-model Lesson {
-  id       String @id @default(cuid())
-  courseId String
-
-  sl String
-
-  titel       String
-  description String
-
-  type LessonType
-
-  video String?
-  pdf   String?
-  quiz  Json?
-
-  additional String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  course Course @relation(fields: [courseId], references: [id])
 }

@@ -4,6 +4,7 @@ CREATE TABLE `Account` (
     `userId` VARCHAR(191) NOT NULL,
     `providerType` VARCHAR(191) NOT NULL,
     `providerId` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(191) NOT NULL,
     `providerAccountId` VARCHAR(191) NOT NULL,
     `refreshToken` VARCHAR(191) NULL,
     `accessToken` VARCHAR(191) NULL,
@@ -11,6 +12,7 @@ CREATE TABLE `Account` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Account_userId_idx`(`userId`),
     UNIQUE INDEX `Account_providerId_providerAccountId_key`(`providerId`, `providerAccountId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -22,11 +24,13 @@ CREATE TABLE `Session` (
     `expires` DATETIME(3) NOT NULL,
     `sessionToken` VARCHAR(191) NOT NULL,
     `accessToken` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `Session_sessionToken_key`(`sessionToken`),
     UNIQUE INDEX `Session_accessToken_key`(`accessToken`),
+    INDEX `Session_userId_idx`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -51,7 +55,7 @@ CREATE TABLE `User` (
     `name` VARCHAR(255) NULL DEFAULT 'Harry',
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NULL,
-    `emailVerified` DATETIME(3) NULL,
+    `email_verified` DATETIME(3) NULL,
     `image` VARCHAR(191) NULL,
     `education` VARCHAR(191) NULL,
     `tags` VARCHAR(191) NULL,
@@ -75,6 +79,7 @@ CREATE TABLE `Course` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Course_authorId_fkey`(`authorId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -82,11 +87,12 @@ CREATE TABLE `Course` (
 CREATE TABLE `Enrollment` (
     `userId` VARCHAR(191) NOT NULL,
     `courseId` VARCHAR(191) NOT NULL,
-    `progress` DOUBLE NOT NULL DEFAULT 0.0,
+    `progress` DOUBLE NOT NULL DEFAULT 0,
     `progressMark` VARCHAR(191) NULL DEFAULT '',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    INDEX `Enrollment_courseId_fkey`(`courseId`),
     PRIMARY KEY (`userId`, `courseId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -105,6 +111,7 @@ CREATE TABLE `Lesson` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
+    INDEX `Lesson_courseId_fkey`(`courseId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -118,10 +125,10 @@ ALTER TABLE `Session` ADD CONSTRAINT `Session_userId_fkey` FOREIGN KEY (`userId`
 ALTER TABLE `Course` ADD CONSTRAINT `Course_authorId_fkey` FOREIGN KEY (`authorId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Enrollment` ADD CONSTRAINT `Enrollment_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Lesson` ADD CONSTRAINT `Lesson_courseId_fkey` FOREIGN KEY (`courseId`) REFERENCES `Course`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

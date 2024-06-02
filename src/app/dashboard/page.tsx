@@ -23,11 +23,11 @@ const Page = () => {
     const getData = async () => {
       if (user.role == "ADMIN" && user.id) {
         let data = await getCreatedCourse(user.id!);
-        console.log(data)
+        console.log(data);
         if (data.success) setCreatedCourse(data.data?.createdCourses!);
       } else {
         let data = await getPurchasedCourse(user.id!);
-        console.log(data)
+        console.log(data);
         if (data.success)
           setPurchasedCourse(data.data?.enrollments.map((e) => e.course)!);
       }
@@ -58,20 +58,18 @@ const Page = () => {
       <div className="flex gap-3 overflow-y-scroll flex-1">
         <div className="courses-container flex flex-wrap gap-6 md:gap-16 w-full justify-evenly  overflow-y-scroll p-3">
           {user.role == "ADMIN" ? (
-            (
-              createdCourse.length ? (
-                createdCourse.map((e, i) => {
-                  return <Course key={i} data={e} />;
-                })
-              ) : (
-                <>
-                  <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
-                    No Data Found
-                    <CreateCourse />
-                  </div>
-                </>
-              )
-            ) 
+            createdCourse.length ? (
+              createdCourse.map((e, i) => {
+                return <Course key={i} data={e} />;
+              })
+            ) : (
+              <>
+                <div className="wrapper flex flex-col gap-4 flex-1 items-center justify-center">
+                  No Data Found
+                  <CreateCourse />
+                </div>
+              </>
+            )
           ) : purchasedCourse.length ? (
             purchasedCourse.map((e, i) => {
               return <Course key={i} data={e} purchase />;
@@ -96,20 +94,20 @@ const Page = () => {
               <CircularProgress
                 size="md"
                 value={
-                  user.enrollments?.length
-                    ? user.enrollments?.reduce((p, c) => p + c.progress, 0)
+                  purchasedCourse?.length
+                    ? user.enrollments?.reduce((p, c) => p + c.progress, 0) || 0
                     : 0
                 }
                 color="success"
                 showValueLabel={true}
-                maxValue={user.enrollments?.length}
+                maxValue={purchasedCourse?.length}
               />
               Progress
             </div>
             <div className="item flex gap-2 font-medium items-center">
               <CircularProgress
                 size="md"
-                value={user.enrollments?.length}
+                value={purchasedCourse?.length}
                 color="warning"
                 showValueLabel={true}
                 maxValue={20}

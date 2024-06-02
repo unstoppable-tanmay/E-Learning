@@ -50,7 +50,7 @@ const Page = () => {
         />
         <div className="courses-container flex flex-wrap gap-6 md:gap-16 w-[clamp(150px,1000px,90vw)] justify-evenly  p-3">
           {courses
-            .filter((e) => e.lessons?.length && e.lessons?.length > 0)
+            .filter((e) => e.lessons?.length! > 0)
             .map((e, i) => {
               return <Course key={i} data={e} />;
             })}

@@ -28,13 +28,13 @@ const Page = ({ params }: { params: { courseId: string } }) => {
 
   useEffect(() => {
     const asyncFunc = async () => {
-      let data = await getCourse(params.courseId,user.id!);
+      let data = await getCourse(params.courseId, user.id!);
       setCourse(data.data);
       setPlayingLesson(data.data?.lessons[0]);
       setEnrollment(data.data?.enrollments[0]!);
     };
     asyncFunc();
-  }, [params]);
+  }, [params,user.id]);
 
   const handleComplete = async (lesson: lessonType) => {
     const res = await progressMarkr(
@@ -80,15 +80,17 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                 <span className="text-5xl font-semibold text-black/40">
                   PDF
                 </span>
-                <Button
-                  endContent={
-                    <>
-                      <FaDownload className="text-2xl" />
-                    </>
-                  }
-                >
-                  Download
-                </Button>
+                <a href={playingLesson.pdf ?? ""} target="_blank" download={""}>
+                  <Button
+                    endContent={
+                      <>
+                        <FaDownload className="text-2xl" />
+                      </>
+                    }
+                  >
+                    Download
+                  </Button>
+                </a>
               </>
             )}
             {playingLesson?.type == "QUIZ" && (
@@ -96,21 +98,23 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                 <span className="text-5xl font-semibold text-black/40">
                   QUIZ
                 </span>
-                <Button
-                  endContent={
-                    <>
-                      <FaDownload className="text-2xl" />
-                    </>
-                  }
-                >
-                  Download
-                </Button>
+                <a href={(playingLesson.quiz as string) ?? ""} target="_blank">
+                  <Button
+                    endContent={
+                      <>
+                        <FaDownload className="text-2xl" />
+                      </>
+                    }
+                  >
+                    Open
+                  </Button>
+                </a>
               </>
             )}
-            {enrollment?.progressMark && !enrollment?.progressMark
+            {!enrollment?.progressMark!
               .split(",")
               .includes(playingLesson?.sl!) && (
-              <div className="markasread absolute bottom-2 right-2">
+              <div className="markasread absolute bottom-2 right-2 z-[1000]">
                 <Button
                   color="primary"
                   onClick={(e) => handleComplete(playingLesson!)}
@@ -150,18 +154,21 @@ const Page = ({ params }: { params: { courseId: string } }) => {
               },
             }}
           >
-            {course?.lessons && course?.lessons.sort((a,b)=>Number(a.sl)-Number(b.sl))?.map((e, i) => {
-              return (
-                <SwiperSlide
-                  key={i}
-                  onClick={(k) => {
-                    setPlayingLesson(e);
-                  }}
-                >
-                  <Lesson data={e} />
-                </SwiperSlide>
-              );
-            })}
+            {course?.lessons &&
+              course?.lessons
+                .sort((a, b) => Number(a.sl) - Number(b.sl))
+                ?.map((e, i) => {
+                  return (
+                    <SwiperSlide
+                      key={i}
+                      onClick={(k) => {
+                        setPlayingLesson(e);
+                      }}
+                    >
+                      <Lesson data={e} />
+                    </SwiperSlide>
+                  );
+                })}
           </Swiper>
         </div>
         <Divider orientation="vertical" className="lg:flex hidden" />
@@ -182,7 +189,9 @@ const Page = ({ params }: { params: { courseId: string } }) => {
             {enrollment?.progress} of them.
           </span>
           <br />
-          {playingLesson?.additional && <div className="heading font-medium">Additional Information</div>}
+          {playingLesson?.additional && (
+            <div className="heading font-medium">Additional Information</div>
+          )}
           <span className="text-sm">{playingLesson?.additional}</span>
         </div>
       </div>
@@ -199,54 +208,60 @@ const Page = ({ params }: { params: { courseId: string } }) => {
         </div>
       </div>
       <div className="lessons flex flex-col gap-4 items-center w-[90%] md:w-[70%] mt-6 flex-1 overflow-y-scroll">
-        {course?.lessons?.sort((a,b)=>Number(a.sl)-Number(b.sl)).map((e, i) => {
-          return (
-            <div
-              key={i}
-              className="w-full flex items-center gap-3 p-4 rounded-xl bg-black/5 duration-300 hover:bg-black/10"
-            >
-              {e.type == "VIDEO" && (
-                <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden">
-                  <Player
-                    width={"100%"}
-                    height={"100%"}
-                    controls
-                    url={e.video!}
-                    playing={false}
+        {course?.lessons
+          ?.sort((a, b) => Number(a.sl) - Number(b.sl))
+          .map((e, i) => {
+            return (
+              <div
+                key={i}
+                className="w-full flex items-center gap-3 p-4 rounded-xl bg-black/5 duration-300 hover:bg-black/10"
+              >
+                {e.type == "VIDEO" && (
+                  <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden">
+                    <Player
+                      width={"100%"}
+                      height={"100%"}
+                      controls
+                      url={e.video!}
+                      playing={false}
+                    />
+                  </div>
+                )}
+                {e.type == "PDF" && (
+                  <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden bg-black/20 font-black text-3xl tracking-widest text-black/70 flex items-center justify-center">
+                    PDF
+                  </div>
+                )}
+                {e.type == "QUIZ" && (
+                  <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden bg-black/20 font-black text-3xl tracking-widest text-black/70 flex items-center justify-center">
+                    QUIZ
+                  </div>
+                )}
+                <div className="details flex flex-col w-[clamp(50px,400px,50vw)]">
+                  <div className="title font-semibold text-lg line-clamp-1 overflow-hidden text-ellipsis">
+                    {e.titel}
+                  </div>
+                  <div className="desc line-clamp-2 text-xs overflow-hidden text-ellipsis">
+                    {e.description}
+                  </div>
+                </div>
+                <div className="flex-1"></div>
+                <div className="flex flex-col gap-2">
+                  <CreateLessons
+                    course={course}
+                    setCourse={setCourse}
+                    update
+                    data={e}
+                  />
+                  <DeleteLesson
+                    data={e}
+                    course={course}
+                    setCourse={setCourse}
                   />
                 </div>
-              )}
-              {e.type == "PDF" && (
-                <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden bg-black/20 font-black text-3xl tracking-widest text-black/70 flex items-center justify-center">
-                  PDF
-                </div>
-              )}
-              {e.type == "QUIZ" && (
-                <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden bg-black/20 font-black text-3xl tracking-widest text-black/70 flex items-center justify-center">
-                  QUIZ
-                </div>
-              )}
-              <div className="details flex flex-col w-[clamp(50px,400px,50vw)]">
-                <div className="title font-semibold text-lg line-clamp-1 overflow-hidden text-ellipsis">
-                  {e.titel}
-                </div>
-                <div className="desc line-clamp-2 text-xs overflow-hidden text-ellipsis">
-                  {e.description}
-                </div>
               </div>
-              <div className="flex-1"></div>
-              <div className="flex flex-col gap-2">
-                <CreateLessons
-                  course={course}
-                  setCourse={setCourse}
-                  update
-                  data={e}
-                />
-                <DeleteLesson data={e} course={course} setCourse={setCourse} />
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
         {course?.lessons?.length == 0 && (
           <div className="flex flex-col gap-3 items-center justify-center w-full h-full">
             No Data Found
