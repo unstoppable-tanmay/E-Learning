@@ -107,7 +107,7 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                 </Button>
               </>
             )}
-            {!enrollment?.progressMark
+            {enrollment?.progressMark && !enrollment?.progressMark
               .split(",")
               .includes(playingLesson?.sl!) && (
               <div className="markasread absolute bottom-2 right-2">
@@ -181,6 +181,9 @@ const Page = ({ params }: { params: { courseId: string } }) => {
             {course?.lessons?.length} and you have completed{" "}
             {enrollment?.progress} of them.
           </span>
+          <br />
+          {playingLesson?.additional && <div className="heading font-medium">Additional Information</div>}
+          <span className="text-sm">{playingLesson?.additional}</span>
         </div>
       </div>
     </section>
