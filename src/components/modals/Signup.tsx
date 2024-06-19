@@ -20,6 +20,7 @@ import { userType } from "@/types/types";
 import { tags } from "@/contsants/constant";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { signIn } from "next-auth/react";
 
 const userSchema = z.object({
   name: z.string().min(3, { message: "Name should atleast 3 character long" }),
@@ -59,6 +60,11 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
     const res = await handleSignUp(user);
     if (!res.success) toast(res.message, { type: "error" });
     else {
+      signIn("credentials", {
+        email: user.email,
+        password: user.password,
+        redirect: false,
+      });
       onClose();
       toast("Signed Up", { type: "success" });
     }

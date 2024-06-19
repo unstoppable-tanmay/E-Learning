@@ -16,6 +16,7 @@ import {
 import { FaGoogle, FaUnlockAlt } from "react-icons/fa";
 import { signIn } from "next-auth/react";
 import { FaLock, FaUnlock } from "react-icons/fa6";
+import { toast } from "react-toastify";
 
 const Signin = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -32,15 +33,19 @@ const Signin = () => {
     setUser((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = () => {
-    signIn("credentials", {
+  const handleSubmit = async () => {
+    const res = await signIn("credentials", {
       email: user.email,
       password: user.password,
+      redirect: false,
     });
+    if (res?.error) toast(res.error, { type: "error" });
+    else if (res?.ok) toast("Signed In", { type: "success" });
   };
   const handleGoogleSignin = () => {
-    signIn("google");
+    signIn("google", { redirect: false });
   };
+
 
   return (
     <>
