@@ -3,11 +3,9 @@
 
 import Signin from "@/components/modals/Signin";
 import Signup from "@/components/modals/Signup";
-import { Button } from "@nextui-org/button";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 
 export default function Home() {
   const session = useSession();
@@ -30,11 +28,21 @@ export default function Home() {
       </nav>
       <div className="landing flex-1 flex flex-col-reverse md:flex-row items-center justify-between gap-28 px-6">
         <div className="flex flex-col gap-10 w-[clamp(300px,650px,90vw)] items-center md:items-start">
-          <div className="heading font-bold text-7xl ">The E-Learning Platform</div>
-          <div className="desc text-lg">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ducimus tempora vel deleniti magni, dicta delectus fuga at voluptatem blanditiis consequatur?</div>
-          <Signup fancy/>
+          <div className="heading font-bold text-7xl ">
+            The E-Learning Platform
+          </div>
+          <div className="desc text-lg">
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ducimus
+            tempora vel deleniti magni, dicta delectus fuga at voluptatem
+            blanditiis consequatur?
+          </div>
+          <Signup fancy />
         </div>
-        <img src="/assets/bg.gif" alt="" className="img w-[clamp(200px,450px,90vw)]"></img>
+        <img
+          src="/assets/bg.gif"
+          alt=""
+          className="img w-[clamp(200px,450px,90vw)]"
+        ></img>
       </div>
     </main>
   );

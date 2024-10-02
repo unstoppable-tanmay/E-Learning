@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 const Signin = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -34,6 +35,7 @@ const Signin = () => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const res = await signIn("credentials", {
       email: user.email,
       password: user.password,
@@ -41,11 +43,13 @@ const Signin = () => {
     });
     if (res?.error) toast(res.error, { type: "error" });
     else if (res?.ok) toast("Signed In", { type: "success" });
+    setIsLoading(false);
   };
   const handleGoogleSignin = () => {
+    setIsLoading(true);
     signIn("google", { redirect: false });
+    setIsLoading(false);
   };
-
 
   return (
     <>
@@ -87,7 +91,12 @@ const Signin = () => {
                 ></Input>
               </ModalBody>
               <ModalFooter className="justify-center flex col">
-                <Button color="primary" onPress={handleSubmit}>
+                <Button
+                  disabled={!isLoading}
+                  isLoading={isLoading}
+                  color="primary"
+                  onPress={handleSubmit}
+                >
                   Log In
                 </Button>
                 <Button

@@ -33,6 +33,7 @@ const userSchema = z.object({
 
 const Signup = ({ fancy = false }: { fancy?: boolean }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
 
   const [user, setUser] = useState<userType>({
     name: "",
@@ -51,6 +52,7 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     let parsedData = userSchema.safeParse(user);
     if (!parsedData.success) {
       console.log(parsedData.error.errors);
@@ -68,6 +70,7 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
       onClose();
       toast("Signed Up", { type: "success" });
     }
+    setLoading(false);
   };
 
   return (
@@ -170,7 +173,12 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
                 </Tabs>
               </ModalBody>
               <ModalFooter className="">
-                <Button color="primary" onPress={handleSubmit}>
+                <Button
+                  disabled={!loading}
+                  isLoading={loading}
+                  color="primary"
+                  onPress={handleSubmit}
+                >
                   Create
                 </Button>
               </ModalFooter>

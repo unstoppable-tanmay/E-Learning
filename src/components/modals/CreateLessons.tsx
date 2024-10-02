@@ -22,6 +22,7 @@ import { userAtom } from "@/atom/atom";
 import { useRecoilState } from "recoil";
 import { createLessons, updateLesson } from "@/actions/lessons";
 import { MdEdit } from "react-icons/md";
+import { JsonArray } from "@prisma/client/runtime/library";
 
 const lessonsSchema = z.object({
   titel: z
@@ -31,7 +32,7 @@ const lessonsSchema = z.object({
   type: z.enum(["VIDEO", "PDF", "QUIZ"]),
   video: z.string(),
   pdf: z.string(),
-  quiz: z.any(),
+  quiz: z.string(),
   additional: z.string(),
   sl: z.string(),
 });
@@ -73,6 +74,7 @@ const CreateLessons = ({
       | "video"
       | "pdf"
       | "quiz"
+      | "slideshow"
       | "additional"
       | "type"
       | "sl"
@@ -192,7 +194,7 @@ const CreateLessons = ({
                       ></Input>
                     </div>
                   </Tab>
-                  <Tab key="QUIZ" value="quiZ" title="quiz">
+                  <Tab key="QUIZ" value="QUIZ" title="quiz">
                     <div className="wrapper flex flex-col gap-3">
                       <Input
                         placeholder="Serial"
@@ -211,6 +213,59 @@ const CreateLessons = ({
                       ></Textarea>
                       <Input
                         placeholder="Quiz Link"
+                        value={lesson.quiz! as string}
+                        onChange={(e) => change(e.target.value, "quiz")}
+                      ></Input>
+                      <Input
+                        placeholder="Additional"
+                        value={lesson.additional!}
+                        onChange={(e) => change(e.target.value, "additional")}
+                      ></Input>
+                    </div>
+                  </Tab>
+                  <Tab key="SLIDESHOW" value="SLIDESHOW" title="slideshow">
+                    <div className="wrapper flex flex-col gap-3">
+                      <Input
+                        placeholder="Serial"
+                        value={lesson.sl}
+                        onChange={(e) => change(e.target.value, "sl")}
+                      ></Input>
+                      <Input
+                        placeholder="Name"
+                        value={lesson.titel}
+                        onChange={(e) => change(e.target.value, "titel")}
+                      ></Input>
+                      <Textarea
+                        placeholder="Description"
+                        value={lesson.description}
+                        onChange={(e) => change(e.target.value, "description")}
+                      ></Textarea>
+                      {(lesson.slideshow as JsonArray)?.map((slide, index) => (
+                        <Input
+                          key={index}
+                          placeholder={`Slide ${index + 1} Link`}
+                          value={slide as string}
+                          onChange={(e) => {
+                            const newSlides = [
+                              ...(lesson.slideshow as JsonArray)!,
+                            ];
+                            newSlides[index] = e.target.value;
+                            change(newSlides, "slideshow");
+                          }}
+                        />
+                      ))}
+                      <Button
+                        onPress={() => {
+                          const newSlides = lesson.slideshow
+                            ? [...(lesson.slideshow as JsonArray), ""]
+                            : [""];
+                          change(newSlides, "slideshow");
+                        }}
+                      >
+                        Add Slide
+                      </Button>
+                      <Input
+                        placeholder="SlideShow Link"
                         value={lesson.quiz! as string}
                         onChange={(e) => change(e.target.value, "quiz")}
                       ></Input>

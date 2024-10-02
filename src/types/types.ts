@@ -35,7 +35,7 @@ export type courseType = {
   price?: string;
   image: string;
 
-  lessons?: lessonType[]
+  lessons?: lessonType[];
 };
 
 export type lessonType = {
@@ -47,11 +47,12 @@ export type lessonType = {
   titel: string;
   description: string;
 
-  type: "VIDEO" | "PDF" | "QUIZ";
+  type: "VIDEO" | "PDF" | "QUIZ" | "SLIDESHOW";
 
   video: string | null;
   pdf: string | null;
   quiz?: JsonValue;
+  slideshow?: JsonValue;
 
   additional?: string | null;
 
@@ -68,5 +69,5 @@ export type enrollments = {
   progress: number;
   progressMark: string | null;
 
-  course?: courseType
+  course?: courseType;
 };
