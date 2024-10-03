@@ -7,7 +7,9 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from "react-responsive-carousel";
 
 const Lesson = ({ data }: { data: lessonType }) => {
+  console.log(data);
   return (
+
     <div className="w-[clamp(100px,200px,80vw)] flex flex-col gap-4">
       {data.type == "VIDEO" && (
         <div className="video w-full aspect-[1/.5] rounded-md object-cover overflow-hidden pointer-events-none">
@@ -27,7 +29,7 @@ const Lesson = ({ data }: { data: lessonType }) => {
       {data.type == "SLIDESHOW" && (
         <div className="carosuel w-full aspect-[1/.5] rounded-md object-cover overflow-hidden bg-black/20 font-black text-3xl tracking-widest text-black/70 flex items-center justify-center">
           <Carousel>
-            {(data.slideshow as JsonArray).map((slide, i) => (
+            {(data.slideshow as JsonArray)?.map((slide, i) => (
               <img
                 key={i}
                 src={slide as string}

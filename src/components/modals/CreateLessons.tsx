@@ -29,12 +29,14 @@ const lessonsSchema = z.object({
     .string()
     .min(3, { message: "Title should atleast 3 character long" }),
   description: z.string(),
-  type: z.enum(["VIDEO", "PDF", "QUIZ"]),
+  type: z.enum(["VIDEO", "PDF", "QUIZ","SLIDESHOW"]),
   video: z.string(),
   pdf: z.string(),
   quiz: z.string(),
+  slideshow:z.array(z.string()),
   additional: z.string(),
   sl: z.string(),
+
 });
 
 const CreateLessons = ({
@@ -264,11 +266,6 @@ const CreateLessons = ({
                       >
                         Add Slide
                       </Button>
-                      <Input
-                        placeholder="SlideShow Link"
-                        value={lesson.quiz! as string}
-                        onChange={(e) => change(e.target.value, "quiz")}
-                      ></Input>
                       <Input
                         placeholder="Additional"
                         value={lesson.additional!}

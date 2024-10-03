@@ -9,7 +9,7 @@ const lessonsSchema = z.object({
     .string()
     .min(3, { message: "Title should atleast 3 character long" }),
   description: z.string(),
-  type: z.enum(["VIDEO", "PDF", "QUIZ"]),
+  type: z.enum(["VIDEO", "PDF", "QUIZ","SLIDESHOW"]),
   video: z.string(),
   pdf: z.string(),
   quiz: z.any(),
@@ -33,6 +33,7 @@ export const createLessons = async (lesson: lessonType, courseId: string) => {
         additional: lesson.additional,
         pdf: lesson.pdf,
         quiz: lesson.quiz ?? undefined,
+        slideshow: lesson.slideshow??undefined,
         video: lesson.video,
         sl: lesson.sl
       },
@@ -63,6 +64,7 @@ export const updateLesson = async (lesson: lessonType, lessonId: string) => {
       data: {
         ...lesson,
         quiz: lesson.quiz ?? undefined,
+        slideshow: lesson.slideshow ?? undefined
       },
     });
 

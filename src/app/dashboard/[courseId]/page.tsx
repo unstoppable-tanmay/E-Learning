@@ -237,6 +237,11 @@ const Page = ({ params }: { params: { courseId: string } }) => {
                     QUIZ
                   </div>
                 )}
+                {e.type == "SLIDESHOW" && (
+                  <div className="video aspect-video h-[clamp(50px,100px,10vh)] rounded-md overflow-hidden bg-black/20 font-black text-xl tracking-widest text-black/70 flex items-center justify-center">
+                    SLIDES
+                  </div>
+                )}
                 <div className="details flex flex-col w-[clamp(50px,400px,50vw)]">
                   <div className="title font-semibold text-lg line-clamp-1 overflow-hidden text-ellipsis">
                     {e.titel}
