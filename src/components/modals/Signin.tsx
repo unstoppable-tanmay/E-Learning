@@ -10,10 +10,8 @@ import {
   Button,
   useDisclosure,
   Input,
-  Tabs,
-  Tab,
 } from "@nextui-org/react";
-import { FaGoogle, FaUnlockAlt } from "react-icons/fa";
+import { FaFacebook, FaGoogle } from "react-icons/fa";
 import { signIn } from "next-auth/react";
 import { FaLock, FaUnlock } from "react-icons/fa6";
 import { toast } from "react-toastify";
@@ -48,6 +46,11 @@ const Signin = () => {
   const handleGoogleSignin = () => {
     setIsLoading(true);
     signIn("google", { redirect: false });
+    setIsLoading(false);
+  };
+  const handleFacebookSignin = () => {
+    setIsLoading(true);
+    signIn("facebook", { redirect: false });
     setIsLoading(false);
   };
 
@@ -105,6 +108,13 @@ const Signin = () => {
                   onPress={handleGoogleSignin}
                 >
                   <FaGoogle /> Google
+                </Button>
+                <Button
+                  color="default"
+                  className="border-2 border-black/20"
+                  onPress={handleFacebookSignin}
+                >
+                  <FaFacebook /> Facebook
                 </Button>
               </ModalFooter>
             </>

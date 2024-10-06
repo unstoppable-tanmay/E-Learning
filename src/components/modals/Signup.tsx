@@ -57,6 +57,7 @@ const Signup = ({ fancy = false }: { fancy?: boolean }) => {
     if (!parsedData.success) {
       console.log(parsedData.error.errors);
       console.log(user);
+      setLoading(false);
       return toast(parsedData.error.errors[0].message, { type: "warning" });
     }
     const res = await handleSignUp(user);

@@ -42,3 +42,22 @@ export const handleSignUp = async (user: userType) => {
     }
   }
 };
+
+export const handleAccountDelete = async (userId: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await prisma.$transaction([
+        prisma.course.deleteMany({ where: { authorId: userId } }),
+        prisma.user.delete({ where: { id: userId } }),
+      ]);
+
+      if (res) {
+        resolve(true);
+      } else {
+        reject(new Error("Failed to delete user and courses"));
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};

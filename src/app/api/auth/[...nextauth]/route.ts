@@ -6,7 +6,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "../../../../../prisma/prisma";
 import { compareSync } from "bcrypt";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 
 const authOptions: NextAuthOptions = {
   providers: [
@@ -40,7 +39,12 @@ const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
-      allowDangerousEmailAccountLinking: true
+      allowDangerousEmailAccountLinking: true,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
